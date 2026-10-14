@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yuki Games – Download H games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --snow:#f4f8fc; --paper:#ffffff; --ink:#1b2a4a; --muted:#5d6f8f;
+  --ice:#bfe6f7; --line:#dbe6f2; --accent:#ff7a4d; --accent-ink:#4a1a08;
+  --hero:#1b2a4a; --hero-ink:#f4f8fc;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+:root[data-theme="dark"]{
+  --snow:#0e1729; --paper:#16223b; --ink:#e9f1fb; --muted:#9db0cf;
+  --ice:#2a4a6e; --line:#25365a; --accent:#ff8a5f; --accent-ink:#2a0d03;
+  --hero:#0a1120; --hero-ink:#e9f1fb;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--snow);color:var(--ink);font:400 16px/1.55 var(--body);padding-bottom:env(safe-area-inset-bottom,0px)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}
+
+/* ===== App-store layout ===== */
+[hidden]{display:none !important}
+main{max-width:880px;margin:0 auto;padding:4px 20px 56px}
+
+/* App bar */
+.appbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
+  padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,calc((100vw - 880px) / 2)) 10px;
+  background:var(--snow);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1.5px solid var(--line)}
+.ib{flex:none;width:42px;height:42px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--ink);
+  font-size:20px;cursor:pointer;display:grid;place-items:center}
+.ib:hover{background:var(--paper)}
+.ib .av{width:36px;height:36px;font-size:16px}
+#bar-av{margin-left:auto}
+.brand{margin-right:12px;font:800 21px var(--display);text-decoration:none;color:var(--ink);white-space:nowrap}
+body.detail .brand{margin-right:auto}
+.brand .shine{background-image:linear-gradient(100deg,var(--ink) 0%,var(--accent) 50%,var(--ink) 100%)}
+.searchbar{flex:1;min-width:0;max-width:560px;display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;
+  border-radius:999px;background:var(--paper);border:1.5px solid var(--line);color:var(--muted)}
+.searchbar:focus-within{border-color:var(--accent)}
+.searchbar .mag{flex:none;width:22px;height:22px}
+.searchbar input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--ink);font:500 15px var(--body)}
+.searchbar input::placeholder{color:var(--muted)}
+body.detail .searchbar{display:none}
+@media (max-width:640px){body:not(.detail) .brand{display:none}}
+
+/* Banner with the animated title */
+.banner{position:relative;overflow:hidden;border-radius:28px;background:var(--hero);color:var(--hero-ink);padding:22px 22px 24px;margin:16px 0 0}
+.intro{position:relative;z-index:2}
+.intro h1{font:800 clamp(36px,9vw,56px)/.95 var(--display);letter-spacing:-.5px}
+.intro p{margin-top:12px;max-width:44ch;color:#c5d6ee;font-size:15.5px}
+.snow{position:absolute;inset:0;pointer-events:none;z-index:1}
+.snow i{position:absolute;top:-12px;background:#fff;border-radius:50%;opacity:.8;animation:fall linear infinite}
+@keyframes fall{to{transform:translate3d(var(--dx),420px,0)}}
+@media (prefers-reduced-motion:reduce){.snow{display:none}}
+
+/* Icon grid (like a phone home screen) */
+.shelf h2{font:800 20px var(--display);margin:26px 0 12px}
+.count{color:var(--muted);font-size:14px;margin:18px 0 0}
+.empty{text-align:center;color:var(--muted);padding:48px 12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 6px;margin:20px auto 0;max-width:560px}
+.cell{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 4px 8px;border-radius:20px;
+  text-align:center;text-decoration:none;color:inherit;cursor:pointer;transition:background .15s,transform .12s}
+.cell:hover{background:var(--paper)}
+.cell:active{transform:scale(.96)}
+.cell .icon{width:76px;height:76px;font-size:38px;border-radius:24px;box-shadow:0 4px 10px rgba(0,0,0,.14)}
+.cell b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font:600 13.5px/1.25 var(--body)}
+.cell small{display:block;color:var(--muted);font-size:12px;margin-top:-4px}
+.meta{color:var(--muted);font-size:13.5px;margin-top:2px}
+
+/* Section title + pager */
+.sect{font:800 20px var(--display);margin:24px 0 0;text-align:center}
+.pager{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin:26px 0 6px}
+.pg{min-width:40px;height:40px;padding:0 10px;display:inline-grid;place-items:center;border-radius:12px;border:1.5px solid var(--line);
+  background:var(--paper);color:var(--ink);text-decoration:none;font:600 15px var(--body)}
+a.pg:hover{border-color:var(--accent)}
+.pg.on{background:var(--ink);color:var(--snow);border-color:var(--ink)}
+.pg.off{opacity:.4}
+.pg.gap{border:0;background:transparent;min-width:20px;padding:0}
+.pinfo{text-align:center;color:var(--muted);font-size:13px}
+@media (max-width:420px){.pager{gap:4px}.pg{min-width:36px;height:38px;padding:0 6px}.pg.gap{min-width:18px;padding:0}}
+
+/* Category headings */
+.shead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;max-width:560px;margin:28px auto 0}
+.shead .sect{margin:0;text-align:left}
+.shead + .grid{margin-top:12px}
+.seeall{color:var(--ink);font-weight:600;font-size:14px;text-decoration:none;padding:4px 0}
+.seeall:hover{color:var(--accent)}
+.nn{color:var(--muted);font-size:13.5px}
+
+/* Shared */
+.icon{width:72px;height:72px;border-radius:22px;display:grid;place-items:center;font-size:36px;background:var(--tint,var(--ice));flex:none;position:relative;overflow:hidden;color:#14213d;font-weight:800}
+.icon img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;-webkit-user-drag:none}
+.icon.big{width:104px;height:104px;font-size:52px;border-radius:30px}
+.dl{display:inline-block;text-decoration:none;white-space:nowrap;background:var(--accent);color:var(--accent-ink);
+  font:600 15px var(--body);padding:11px 20px;border-radius:999px;transition:transform .15s;text-align:center}
+.dl:hover{transform:translateY(-2px)}
+.dl:active{transform:scale(.95)}
+.dl.sm{padding:8px 16px;font-size:14px}
+.dl.wide{display:block;padding:14px 20px;font-size:16px}
+button.dl{border:0;cursor:pointer;width:100%}
+.dlbox{margin-bottom:14px}
+.wait{background:var(--paper);border:1.5px solid var(--line);border-radius:20px;padding:18px}
+.whead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;font-weight:600}
+.cd{font:800 26px/1 var(--display);color:var(--accent)}
+.track{height:14px;border-radius:999px;background:var(--line);overflow:hidden}
+.fill{height:100%;width:0;border-radius:999px;box-shadow:0 0 12px var(--accent);
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.3) 0 10px,transparent 10px 20px),var(--accent);
+  background-size:28px 28px,100% 100%;animation:stripes .8s linear infinite}
+@keyframes stripes{to{background-position:28px 0,0 0}}
+@media (prefers-reduced-motion:reduce){.fill{animation:none}}
+.linkbtn{background:none;border:0;color:var(--muted);cursor:pointer;font:500 14px var(--body);margin-top:12px;padding:4px 0;text-decoration:underline}
+.vframe{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;margin-top:10px}
+.vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* Detail page */
+.back{display:inline-block;text-decoration:none;color:var(--muted);font-weight:500;margin:14px 0 6px}
+.back:hover{color:var(--ink)}
+.dhead{display:flex;gap:18px;align-items:center;margin:8px 0 18px}
+.dhead h1{font:800 clamp(26px,6vw,36px)/1.1 var(--display)}
+.dev{font-weight:600;margin-top:2px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);margin:6px 0 20px}
+.facts div{padding:4px 6px;text-align:center;border-left:1.5px solid var(--line)}
+.facts div:first-child{border-left:0}
+.facts b{display:block;font:800 16px var(--display)}
+.facts span{color:var(--muted);font-size:12.5px}
+.panel{background:var(--paper);border:1.5px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px}
+.panel h2{font:800 18px var(--display);margin-bottom:6px}
+
+/* Themes (set with data-theme on <html>) */
+html[data-theme="dark"]{color-scheme:dark}
+/* Corner style (Appearance > Corners) */
+html[data-round="sharp"] :is(.row,.panel,details,.search,select,.icon){border-radius:6px}
+html[data-round="sharp"] :is(.dl,.opt,.theme){border-radius:8px}
+html[data-round="bubble"] :is(.row,.panel,details){border-radius:34px}
+html[data-round="bubble"] .icon{border-radius:50%}
+html[data-round="bubble"] .search{border-radius:999px}
+
+/* Corner + glass rules for app-store components */
+html[data-round="sharp"] :is(.banner,.searchbar,.cell .icon){border-radius:6px}
+html[data-round="bubble"] .banner{border-radius:40px}
+html[data-round="bubble"] .searchbar{border-radius:999px}
+
+/* Menu */
+.navseg{display:flex;flex-wrap:wrap;gap:8px}
+a.opt{display:inline-block;text-decoration:none}
+.opt[aria-current="page"]{background:var(--ink);color:var(--snow);border-color:var(--ink)}
+#menu-btn{display:flex;align-items:center;gap:6px}
+.scrim{position:fixed;inset:0;background:rgba(8,14,28,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:30}
+.scrim.open{opacity:1;pointer-events:auto}
+.menu{position:fixed;top:0;right:0;bottom:0;width:min(340px,100%);z-index:31;background:var(--paper);color:var(--ink);
+  border-left:1.5px solid var(--line);overflow-y:auto;visibility:hidden;transform:translateX(100%);
+  padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));
+  transition:transform .25s ease,visibility .25s}
+.menu.open{visibility:visible;transform:none}
+.menu-head{display:flex;justify-content:space-between;align-items:center}
+.menu-head h2{font:800 22px var(--display)}
+.x{border:0;background:var(--snow);color:var(--ink);width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer}
+.menu h3{font:600 14px var(--body);color:var(--muted);margin:22px 0 8px}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--snow);color:var(--ink);border-radius:999px;
+  padding:9px 15px;font:500 14px var(--body);cursor:pointer}
+.opt[aria-pressed="true"]{background:var(--ink);color:var(--snow);border-color:var(--ink)}
+.hint{color:var(--muted);font-size:13.5px;margin-top:24px}
+#toast{z-index:50}
+
+/* Animated title */
+.brand{display:inline-flex;align-items:center;gap:8px}
+.fl{display:inline-block;animation:spin 10s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.shine{color:transparent;-webkit-background-clip:text;background-clip:text;background-size:300% 100%;
+  background-image:linear-gradient(100deg,#fff 0%,#bfe6f7 35%,var(--accent) 50%,#bfe6f7 65%,#fff 100%);
+  animation:shine 6s linear infinite}
+@keyframes shine{from{background-position:0 0}to{background-position:-150% 0}}
+.intro h1{position:relative;display:inline-block;filter:drop-shadow(0 0 14px rgba(150,215,245,.4));animation:glow 4s ease-in-out infinite alternate}
+@keyframes glow{from{filter:drop-shadow(0 0 8px rgba(150,215,245,.25))}to{filter:drop-shadow(0 0 26px rgba(185,228,255,.75))}}
+.ch{display:inline-block;cursor:default;color:transparent;-webkit-background-clip:text;background-clip:text;background-size:300% 100%;
+  background-image:linear-gradient(100deg,#fff 0%,#bfe6f7 28%,var(--accent) 50%,#bfe6f7 72%,#fff 100%);
+  animation:chIn .9s cubic-bezier(.2,.9,.3,1.2) both,shine 5s linear infinite;
+  animation-delay:calc(var(--i) * .07s),calc(var(--i) * -.25s)}
+@keyframes chIn{from{opacity:0;transform:translateY(-44px) scale(.6) rotate(-8deg);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+.tw{position:absolute;pointer-events:none;font-style:normal;line-height:1;color:#fff;font-size:var(--s,16px);
+  text-shadow:0 0 8px #fff,0 0 16px var(--accent);animation:tw var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s);opacity:0}
+@keyframes tw{0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0deg)}50%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(90deg)}}
+@media (prefers-reduced-motion:reduce){.ch,.shine,.fl,.tw,.intro h1{animation:none}.tw{opacity:.8}}
+
+/* Admin profile */
+.av{flex:none;display:grid;place-items:center;border-radius:50%;color:var(--accent-ink);font:800 20px var(--display);
+  background:linear-gradient(135deg,var(--accent),var(--ice)) center/cover no-repeat}
+.modal{position:fixed;inset:0;z-index:35;display:grid;place-items:center;padding:16px;background:rgba(8,14,28,.55);
+  opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.modal.open{opacity:1;visibility:visible}
+.pcard{position:relative;width:min(420px,100%);max-height:100%;overflow-y:auto;background:var(--paper);color:var(--ink);
+  border:1.5px solid var(--line);border-radius:28px;transform:translateY(16px) scale(.97);transition:transform .25s}
+.modal.open .pcard{transform:none}
+.pcover{height:110px;background:var(--hero);background-size:cover;background-position:center}
+.pbody{padding:0 22px 22px;text-align:center}
+.pav{width:104px;height:104px;font-size:44px;margin:-52px auto 10px;border:4px solid var(--paper);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.pcard h2{font:800 26px/1.1 var(--display)}
+.handle{color:var(--muted);font-size:14px}
+.role{display:inline-block;margin:10px 0;padding:4px 12px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font:600 13px var(--body)}
+.bio{white-space:pre-wrap;font-size:15px;margin:6px 0 16px}
+.stats{display:flex;justify-content:center;gap:30px;margin-bottom:18px}
+.stats b{display:block;font:800 22px var(--display)}
+.stats span{color:var(--muted);font-size:13px}
+.pf-x{position:absolute;top:12px;right:12px;z-index:2;background:rgba(0,0,0,.4);color:#fff}
+
+/* Copy protection */
+html.nocopy body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html.nocopy input,html.nocopy textarea,html.nocopy select{-webkit-user-select:text;user-select:text}
+@media print{html.nocopy body{display:none}}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);
+  background:var(--ink);color:var(--snow);padding:10px 18px;border-radius:999px;font-size:14px;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:10}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* Guide */
+footer{text-align:center;color:var(--muted);font-size:13.5px;padding:0 20px 36px;max-width:60ch;margin:0 auto}
+
+@media (max-width:600px){
+  .banner{padding:24px 20px 26px;border-radius:24px}
+  .icon.big{width:84px;height:84px;font-size:42px;border-radius:24px}
+  .facts div{padding:4px 2px}
+  .facts b{font-size:14px;white-space:nowrap}
+}
+}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <button class="ib" id="menu-btn" type="button" aria-label="Open menu" aria-haspopup="dialog" aria-controls="menu" aria-expanded="false">☰</button>
+  <a class="brand" href="#/"><span class="fl" aria-hidden="true">❄</span><span class="shine">Yuki Games</span></a>
+  <label class="searchbar"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <linearGradient id="mg-rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--muted)"/><stop offset="1" style="stop-color:var(--ink)"/></linearGradient>
+        <linearGradient id="mg-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" style="stop-color:var(--ice)" stop-opacity=".7"/></linearGradient>
+      </defs>
+      <line x1="15.6" y1="15.6" x2="21.4" y2="21.4" stroke="url(#mg-rim)" stroke-width="3.4" stroke-linecap="round"/>
+      <circle cx="10" cy="10" r="6.8" fill="url(#mg-glass)" stroke="url(#mg-rim)" stroke-width="2"/>
+      <path d="M6.4 9.4a3.9 3.9 0 0 1 2.9-2.9" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".95"/>
+    </svg><input id="q" type="search" placeholder="Search games &amp; apps" aria-label="Search games and apps" autocomplete="off"></label>
+  <button class="ib" id="bar-av" type="button" aria-label="Admin profile"><span class="av" id="bar-av-img" aria-hidden="true"></span></button>
+</header>
+
+<main>
+  <section id="home">
+    <div class="banner" id="banner">
+      <div class="snow" id="snow" aria-hidden="true"></div>
+      <div class="intro">
+        <h1>Yuki<br>Games</h1>
+        <p>Tap an icon to download </p>
+      </div>
+    </div>
+    <div id="feed"></div>
+  </section>
+  <section id="detail" hidden></section>
+
+</main>
+
+<div class="modal" id="profile" role="dialog" aria-labelledby="pf-name">
+  <div class="pcard">
+    <button class="x pf-x" id="pf-close" type="button" aria-label="Close profile">✕</button>
+    <div class="pcover" id="pf-cover"></div>
+    <div class="pbody">
+      <div class="av pav" id="pf-av"></div>
+      <div id="pf-view">
+        <h2 id="pf-name"></h2>
+        <div class="handle" id="pf-handle"></div>
+        <span class="role" id="pf-role"></span>
+        <p class="bio" id="pf-bio"></p>
+        <div class="stats">
+          <div><b id="st-items"></b><span>Games &amp; apps</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="menu" id="menu" role="dialog" aria-labelledby="menu-title">
+  <div class="menu-head">
+    <h2 id="menu-title">Menu</h2>
+    <button class="x" id="menu-close" type="button" aria-label="Close menu">✕</button>
+  </div>
+  <h3>Browse</h3>
+  <nav class="navseg" id="navlinks" aria-label="Browse">
+    <a class="opt" href="#/" data-nav="home">Home</a>
+    <a class="opt" href="#/games" data-nav="games">Games</a>
+    <a class="opt" href="#/apps" data-nav="apps">Apps</a>
+  </nav>
+  <h3>Theme</h3>
+  <div class="seg" data-key="theme">
+    <button class="opt" type="button" data-v="light">Light</button>
+    <button class="opt" type="button" data-v="dark">Dark</button>
+  </div>
+  <h3>Corners</h3>
+  <div class="seg" data-key="round">
+    <button class="opt" type="button" data-v="sharp">Sharp</button>
+    <button class="opt" type="button" data-v="soft">Soft</button>
+    <button class="opt" type="button" data-v="bubble">Bubble</button>
+  </div>
+  <h3>Banner snowfall</h3>
+  <div class="seg" data-key="snow">
+    <button class="opt" type="button" data-v="true">On</button>
+    <button class="opt" type="button" data-v="false">Off</button>
+  </div>
+  <p class="hint">Your choices are saved on this device.</p>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Copying is disabled on this site.</div>
+
+<footer>Created by Yuki Games </footer>
+
+<script>
+/* ===== HOW TO ADD OR DELETE A GAME / APP =====
+   ADD:    copy the template below and paste it as the FIRST entry of the list that starts right under this comment
+           (just after its opening [ ). New items go first, so they show up first on the page.
+   DELETE: remove the whole block, from {id:"..." to its closing "}," (include the comma).
+
+   {id:"my-game", name:"My Game", type:"Game", icon:"", image:"https://files.catbox.moe/xxxx.png", video:"", download:"", tint:"#bfe6f7", dev:"My Name",
+    about:"A longer description of the game.",
+    versions:[["1.0.0","2026-10-13","50 MB","First release."]]},
+
+   id        unique, lowercase letters / numbers / hyphens, no spaces (it becomes the page link #/item/my-game)
+   type      exactly "Game" or "App"   (decides which section it appears in)
+   icon      optional emoji. Leave "" if you use an image (if the image is missing or fails to load, the first letter of the name is shown)
+   image     link to the icon picture, e.g. https://files.catbox.moe/xxxx.png   ("" = use the emoji / first letter)
+   video     YouTube link   ("" = no video box)
+   download  link opened after the 10-second wait   ("" = use apk/<id>-<version>.apk)
+   tint      color behind the icon, e.g. #bfe6f7
+   versions  newest first: [version, date as YYYY-MM-DD, size, what's new]. Only the first (newest) one is shown.
+   Do not type a double quote " inside the text. Use ’ instead (or write \" ). */
+const ITEMS = [
+   {id:"shogun-trainer", name:"Shogun Trainer", type:"Game", icon:"", image:"https://files.catbox.moe/mfbepk.png", video:"", download:"https://pixeldrain.com/u/jrZS6ib4", tint:"#bfe6f7", dev:"HSK Company",
+ about:"Have fun playing the game",
+ versions:[["0.6","2026-10-14","525.89 MB","First release"]]},
+   {id:"joiplay", name:"joiplay", type:"App", icon:"", image:"https://files.catbox.moe/7rbboa.png", video:"", download:"https://mega.nz/file/br4nwQ4b#rAPGU8CikRV9_aSeO88lmIzfpKRPcSWBdZP-Dka_xCQ", tint:"#bfe6f7", dev:"JoiPlay Team",
+ about:"App for playing games (Download required)",
+ versions:[["1.21.000","2026-10-13","26,4 MB","First release"]]},
+  
+];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = d => new Date(d + "T00:00:00").toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
+const vers = it => it.versions.map(([v, date, size, notes], i) =>
+  ({v, date, size, notes, latest: i === 0, file: (i === 0 && it.download) || `apk/${it.id}-${v}.apk`}));
+
+/* Home page: a simple grid of icons. Tap one to open its page. */
+const fmtShort = d => new Date(d + "T00:00:00").toLocaleDateString("en-US", {month: "short", year: "numeric"});
+let query = "";
+const okUrl = u => typeof u === "string" && /^https?:\/\/[^\s"'<>]+$/i.test(u);
+const iconFallback = it => it.icon || (String(it.name).trim()[0] || "?").toUpperCase();
+const iconInner = it => okUrl(it.image)
+  ? `<img src="${esc(it.image)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-fb="${esc(iconFallback(it))}" onerror="this.replaceWith(this.dataset.fb)">`
+  : esc(iconFallback(it));
+const cell = it =>
+  `<a class="cell" href="#/item/${it.id}"><div class="icon" style="--tint:${it.tint}" aria-hidden="true">${iconInner(it)}</div><b>${esc(it.name)}</b><small>${it.type} • ${vers(it)[0].size}</small></a>`;
+/* Sections and pages. PER_PAGE games per page; the next page opens automatically when a page is full. */
+const PER_PAGE = 9;
+const SECTIONS = {home: "Home", games: "Games", apps: "Apps"};
+let sec = "home", pageNo = 1, lastList = "#/";
+const listFor = k => ITEMS.filter(i => k === "games" ? i.type === "Game" : k === "apps" ? i.type === "App" : true);
+const pageHref = (k, p) => p === 1 ? (k === "home" ? "#/" : "#/" + k) : `#/${k}/${p}`;
+function pager(p, pages){
+  if (pages <= 1) return "";
+  const nums = [...new Set([1, pages, p - 1, p, p + 1])].filter(n => n >= 1 && n <= pages).sort((a, b) => a - b);
+  let mid = "", last = 0;
+  for (const n of nums){
+    if (n - last > 1) mid += `<span class="pg gap" aria-hidden="true">…</span>`;
+    mid += `<a class="pg${n === p ? " on" : ""}" href="${pageHref(sec, n)}"${n === p ? ' aria-current="page"' : ""} aria-label="Page ${n}">${n}</a>`;
+    last = n;
+  }
+  const prev = p > 1 ? `<a class="pg" href="${pageHref(sec, p - 1)}" aria-label="Previous page">‹</a>` : `<span class="pg off" aria-hidden="true">‹</span>`;
+  const next = p < pages ? `<a class="pg" href="${pageHref(sec, p + 1)}" aria-label="Next page">›</a>` : `<span class="pg off" aria-hidden="true">›</span>`;
+  return `<nav class="pager" aria-label="Pages">${prev}${mid}${next}</nav><p class="pinfo">Page ${p} of ${pages}</p>`;
+}
+function renderFeed(){
+  const q = query.trim().toLowerCase();
+  const match = k => listFor(k).filter(i => i.name.toLowerCase().includes(q));
+  const none = q ? `<p class="empty">No results for “${esc(query)}”. Try a different name.</p>` : `<p class="empty">Nothing here yet.</p>`;
+  /* Home: Games and Apps are shown in separate sections */
+  if (sec === "home"){
+    $("banner").hidden = !!q;
+    const parts = ["games", "apps"].map(k => {
+      const all = match(k);
+      if (!all.length) return "";
+      const more = all.length > PER_PAGE ? `<a class="seeall" href="${pageHref(k, 1)}">See all (${all.length}) ›</a>` : "";
+      return `<div class="shead"><h2 class="sect">${SECTIONS[k]}</h2>${more}</div><div class="grid">${all.slice(0, PER_PAGE).map(cell).join("")}</div>`;
+    }).join("");
+    $("feed").innerHTML = parts || none;
+    return;
+  }
+  /* Games / Apps page: one category, PER_PAGE per page */
+  const all = match(sec);
+  const pages = Math.max(1, Math.ceil(all.length / PER_PAGE));
+  const p = Math.min(pageNo, pages);
+  const items = all.slice((p - 1) * PER_PAGE, p * PER_PAGE);
+  $("banner").hidden = true;
+  const note = q ? `${all.length} ${all.length === 1 ? "result" : "results"}` : `${all.length} ${all.length === 1 ? "item" : "items"}`;
+  $("feed").innerHTML = `<div class="shead"><h2 class="sect">${SECTIONS[sec]}</h2><span class="nn" aria-live="polite">${note}</span></div>` +
+    (items.length ? `<div class="grid">${items.map(cell).join("")}</div>${pager(p, pages)}` : none);
+}
+$("q").addEventListener("input", e => {
+  query = e.target.value;
+  if (pageNo === 1) renderFeed(); else location.hash = pageHref(sec, 1);
+});
+
+/* Detail page (shows the newest version = first entry in "versions") */
+const WAIT = 10;                       /* seconds before the download starts */
+let dlTimer, dlReset;
+const stopDownload = () => { clearInterval(dlTimer); clearTimeout(dlReset); };
+const ytId = u => {
+  const t = String(u || "").trim();
+  const m = t.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/|v\/))([\w-]{11})/i) || t.match(/^([\w-]{11})$/);
+  return m ? m[1] : "";
+};
+function resetDownload(){
+  stopDownload();
+  const b = $("get");
+  if (!b) return;
+  $("wait").hidden = true;
+  b.hidden = false;
+}
+function startDownload(){
+  const btn = $("get"), bar = $("bar"), file = btn.dataset.file;
+  stopDownload();
+  btn.hidden = true;
+  $("wait").hidden = false;
+  $("wtext").textContent = "Getting your download ready…";
+  $("cd").textContent = WAIT;
+  bar.style.transition = "none";
+  bar.style.width = "0%";
+  void bar.offsetWidth;
+  bar.style.transition = `width ${WAIT}s linear`;
+  bar.style.width = "100%";
+  const t0 = performance.now();
+  const tick = () => {
+    const left = Math.max(0, WAIT - (performance.now() - t0) / 1000);
+    $("cd").textContent = Math.ceil(left);
+    $("pbar").setAttribute("aria-valuenow", String(Math.round((1 - left / WAIT) * 100)));
+    if (left <= 0){
+      clearInterval(dlTimer);
+      $("wtext").textContent = "Starting your download…";
+      location.href = file;
+      dlReset = setTimeout(resetDownload, 4000);
+    }
+  };
+  dlTimer = setInterval(tick, 200);
+  tick();
+}
+function showDetail(it){
+  stopDownload();
+  document.title = it.name + " – Yuki Games";
+  const x = vers(it)[0];
+  const more = ITEMS.filter(i => i !== it && i.type === it.type).slice(0, 6);
+  const facts = [[x.size, "Size"], ["v" + x.v, "Version"], [fmtShort(x.date), "Updated"]]
+    .map(([b, l]) => `<div><b>${b}</b><span>${l}</span></div>`).join("");
+  const vid = ytId(it.video);
+  const video = vid ? `<div class="panel"><h2>Video</h2><div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/${vid}?rel=0" title="${esc(it.name)} video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>` : "";
+  $("detail").innerHTML = `
+    <a class="back" href="${lastList}">‹ Back</a>
+    <div class="dhead">
+      <div class="icon big" style="--tint:${it.tint}" aria-hidden="true">${iconInner(it)}</div>
+      <div><h1>${esc(it.name)}</h1><div class="dev">${esc(it.dev)}</div><div class="meta">${it.type}</div></div>
+    </div>
+    <div class="facts">${facts}</div>
+    <div class="dlbox">
+      <button class="dl wide" id="get" type="button" data-file="${esc(x.file)}">Download</button>
+      <div class="wait" id="wait" hidden>
+        <div class="whead"><span id="wtext">Getting your download ready…</span><b class="cd"><span id="cd">${WAIT}</span>s</b></div>
+        <div class="track" id="pbar" role="progressbar" aria-label="Download starting" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill" id="bar"></div></div>
+        <button class="linkbtn" id="cancel" type="button">Cancel</button>
+      </div>
+    </div>
+    ${video}
+    <div class="panel"><h2>What’s new</h2><p>${esc(x.notes)}</p></div>
+    <div class="panel"><h2>About this ${it.type.toLowerCase()}</h2><p>${esc(it.about)}</p></div>
+    ${more.length ? `<section class="shelf"><h2>More ${it.type === "Game" ? "games" : "apps"}</h2><div class="grid">${more.map(cell).join("")}</div></section>` : ""}`;
+  $("get").addEventListener("click", startDownload);
+  $("cancel").addEventListener("click", resetDownload);
+}
+
+/* Routing:  #/ = Home   #/games   #/apps   (add /2, /3 … for more pages)   #/item/<id> = detail page */
+function route(){
+  stopDownload();
+  const hash = location.hash;
+  const m = hash.match(/^#\/item\/([\w-]+)/);
+  const it = m && ITEMS.find(x => x.id === m[1]);
+  if (!it){
+    const r = hash.match(/^#\/(home|games|apps)?(?:\/(\d+))?\/?$/);
+    sec = (r && r[1]) || "home";
+    pageNo = Math.max(1, parseInt(r && r[2], 10) || 1);
+    if (sec === "home") pageNo = 1;
+    lastList = pageHref(sec, pageNo);
+  }
+  document.body.classList.toggle("detail", !!it);
+  $("home").hidden = !!it;
+  $("detail").hidden = !it;
+  document.querySelectorAll("#navlinks a").forEach(a => {
+    if (!it && a.dataset.nav === sec) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
+  if (it) showDetail(it);
+  else {
+    document.title = sec === "home" ? "Yuki Games – Download Android games and apps" : SECTIONS[sec] + " – Yuki Games";
+    renderFeed();
+  }
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+
+/* ===== Settings (saved in this browser) ===== */
+const S = {theme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light", round: "soft", snow: true};
+try { Object.assign(S, JSON.parse(localStorage.getItem("yuki-settings") || "{}")); } catch (e) {}
+if (S.theme !== "dark" && S.theme !== "light") S.theme = "light";
+if (!["sharp", "soft", "bubble"].includes(S.round)) S.round = "soft";
+const save = () => { try { localStorage.setItem("yuki-settings", JSON.stringify(S)); } catch (e) {} };
+function apply(){
+  const r = document.documentElement;
+  r.dataset.theme = S.theme;
+  r.dataset.round = S.round;
+  $("snow").style.display = S.snow ? "" : "none";
+  document.querySelectorAll(".seg").forEach(g => g.querySelectorAll(".opt").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.v === String(S[g.dataset.key])))));
+}
+
+/* ===== Menu ===== */
+const menu = $("menu"), scrim = $("scrim"), menuBtn = $("menu-btn");
+let lastFocus;
+function openMenu(open){
+  menu.classList.toggle("open", open);
+  scrim.classList.toggle("open", open);
+  menuBtn.setAttribute("aria-expanded", String(open));
+  if (open){ lastFocus = document.activeElement; $("menu-close").focus(); }
+  else if (lastFocus) lastFocus.focus();
+}
+menuBtn.addEventListener("click", () => openMenu(true));
+$("menu-close").addEventListener("click", () => openMenu(false));
+scrim.addEventListener("click", () => openMenu(false));
+document.addEventListener("keydown", e => { if (e.key === "Escape" && menu.classList.contains("open")) openMenu(false); });
+menu.addEventListener("click", e => {
+  if (e.target.closest("a")){ openMenu(false); return; }
+  const b = e.target.closest(".opt");
+  if (!b || !b.dataset.v) return;
+  const v = b.dataset.v;
+  S[b.parentElement.dataset.key] = v === "true" ? true : v === "false" ? false : v;
+  save(); apply();
+});
+
+apply();
+
+/* ===== Toast ===== */
+let toastTimer;
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+/* ===== Admin profile (read-only on the page) =====
+   To change the profile, edit this ADMIN block in the code:
+   - name, handle, role, bio: plain text
+   - avatar: the round profile picture
+   - cover:  the wide picture at the top of the profile card
+     Both accept an image path like "img/me.jpg", an https:// link (e.g. a catbox link), or a data: URL.
+     PNG, JPG, WebP and animated GIF all work (GIFs move). Leave "" for none:
+     the avatar then shows the first letter of the name, and the cover uses the theme color. */
+const ADMIN = {
+  name: "ゆきゲム",
+  handle: "@Moonxz0q",
+  role: "Admin",
+  bio: "Thank you all for supporting the channel. I hope you enjoy the game! If you run into any issues or find a broken link, please leave a comment on the video so I can fix it",
+  avatar: "https://files.catbox.moe/acd4wv.jpg",
+  cover: ""
+};
+try { localStorage.removeItem("yuki-profile"); } catch (e) {}  /* clear edits saved by an older version */
+const okImg = u => typeof u === "string" && /^(data:image\/[a-z+]+;base64,[A-Za-z0-9+\/=]+|[\w.\/-]+\.(png|jpe?g|webp|gif|svg)|https?:\/\/[^\s"')]+)$/i.test(u);
+function paintAvatar(el){
+  if (okImg(ADMIN.avatar)){ el.style.backgroundImage = `url("${ADMIN.avatar}")`; el.textContent = ""; }
+  else { el.style.backgroundImage = ""; el.textContent = (ADMIN.name.trim()[0] || "Y").toUpperCase(); }
+}
+function paintCover(el){
+  el.style.backgroundImage = okImg(ADMIN.cover) ? `url("${ADMIN.cover}")` : "";
+}
+function renderProfile(){
+  paintCover($("pf-cover"));
+  $("pf-name").textContent = ADMIN.name;
+  $("pf-handle").textContent = ADMIN.handle;
+  $("pf-role").textContent = ADMIN.role;
+  $("pf-bio").textContent = ADMIN.bio;
+  $("st-items").textContent = ITEMS.length;
+  paintAvatar($("pf-av"));
+  paintAvatar($("bar-av-img"));
+}
+const modal = $("profile");
+let pfFocus;
+function openProfile(open){
+  modal.classList.toggle("open", open);
+  if (open){ pfFocus = document.activeElement; $("pf-close").focus(); }
+  else if (pfFocus) pfFocus.focus();
+}
+$("bar-av").addEventListener("click", () => openProfile(true));
+$("pf-close").addEventListener("click", () => openProfile(false));
+modal.addEventListener("click", e => { if (e.target === modal) openProfile(false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && modal.classList.contains("open")) openProfile(false); });
+renderProfile();
+
+/* ===== Animated title: letters drop in, shimmer, sparkle, and hop on hover / tap ===== */
+const title = document.querySelector(".intro h1");
+let ci = 0;
+title.setAttribute("aria-label", "Yuki Games");
+title.innerHTML = ["Yuki", "Games"].map(w =>
+  [...w].map(c => `<span class="ch" aria-hidden="true" style="--i:${ci++}">${c}</span>`).join("")).join("<br>") +
+  [[4, -6], [52, -10], [98, 8], [14, 98], [66, 104], [102, 62]].map(([x, y], k) =>
+    `<i class="tw" aria-hidden="true" style="left:${x}%;top:${y}%;--s:${14 + (k % 3) * 6}px;--d:${2.2 + k * .35}s;--dl:${-k * .6}s">✦</i>`).join("");
+const chars = [...title.querySelectorAll(".ch")];
+const hop = (el, delay = 0) => el.animate([
+  {transform: "translateY(0) scale(1) rotate(0deg)"},
+  {transform: "translateY(-16px) scale(1.14) rotate(-5deg)", offset: .4},
+  {transform: "translateY(0) scale(1) rotate(0deg)"}
+], {duration: 560, delay, easing: "cubic-bezier(.3,1.5,.5,1)"});
+chars.forEach(c => c.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") hop(c); }));
+title.addEventListener("click", () => chars.forEach((c, i) => hop(c, i * 55)));
+
+/* Copy protection (set to false to turn it off).
+   Blocks selecting, copying, right-click, dragging and common shortcuts.
+   Search box and version dropdown still work normally. */
+const COPY_PROTECTION = true;
+if (COPY_PROTECTION) {
+  document.documentElement.classList.add("nocopy");
+  const elOf = n => n && (n.nodeType === 1 ? n : n.parentElement);
+  const editable = n => { const e = elOf(n); return !!(e && e.closest("input,textarea,select")); };
+  const warn = () => toast("Copying is disabled on this site.");
+  const block = (e, show) => { e.preventDefault(); if (show) warn(); };
+
+  ["copy", "cut"].forEach(ev => document.addEventListener(ev, e => {
+    if (!editable(document.activeElement)) block(e, true);
+  }));
+  document.addEventListener("contextmenu", e => { if (!editable(e.target)) block(e, true); });
+  document.addEventListener("selectstart", e => { if (!editable(e.target)) e.preventDefault(); });
+  document.addEventListener("dragstart", e => e.preventDefault());
+  document.addEventListener("keydown", e => {
+    if (!(e.ctrlKey || e.metaKey) || editable(document.activeElement)) return;
+    if (["c", "x", "a", "u", "s"].includes(e.key.toLowerCase())) block(e, true);
+  });
+}
+
+/* Snowfall in the header */
+$("snow").innerHTML = Array.from({length:26}, () => {
+  const s = 3 + Math.random()*5, x = Math.random()*100, d = 6 + Math.random()*7, dl = -Math.random()*d;
+  return `<i style="left:${x}%;width:${s}px;height:${s}px;animation-duration:${d}s;animation-delay:${dl}s;--dx:${(Math.random()*60-30)|0}px"></i>`;
+}).join("");
+
+route();
+</script>
+</body>
+</html>
